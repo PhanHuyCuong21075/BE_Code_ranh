@@ -34,9 +34,16 @@ public class AuthService {
         if (repo.existsByUsername(req.username())) {
             throw new RuntimeException("Username already taken");
         }
+        if (repo.existsByEmail(req.email())) {
+            throw new RuntimeException("Email already taken");
+        }
+        if (!req.password().equals(req.confirmPassword())) {
+            throw new RuntimeException("Passwords do not match");
+        }
         User u = new User();
         u.setUsername(req.username());
         u.setPassword(encoder.encode(req.password()));
+        u.setEmail(req.username());
         repo.save(u);
     }
 }
