@@ -3,6 +3,8 @@ package com.cuongph.be_code.entity;
 import jakarta.persistence.*;
 import lombok.Data;
 
+import java.util.Set;
+
 @Entity
 @Data
 @Table(name = "role_menu")
@@ -12,10 +14,15 @@ public class RoleMenu {
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;
 
-    @Column(nullable = false, length = 50)
-    private String role;  // ví dụ: "ADMIN", "USER"
+    // Role name, ví dụ "ADMIN", "USER"
+    @Column(nullable = false)
+    private String roleName;
 
-    @ManyToOne
-    @JoinColumn(name = "menu_id", nullable = false)
-    private Menu menu;
+    @ManyToMany
+    @JoinTable(
+            name = "role_menu_mapping",
+            joinColumns = @JoinColumn(name = "role_menu_id"),
+            inverseJoinColumns = @JoinColumn(name = "menu_id")
+    )
+    private Set<Menu> menus;
 }

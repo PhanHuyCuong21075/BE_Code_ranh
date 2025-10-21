@@ -2,9 +2,8 @@ package com.cuongph.be_code.controller;
 
 import com.cuongph.be_code.auth.AuthService;
 import com.cuongph.be_code.dto.AuthRequest;
-import com.cuongph.be_code.dto.AuthResponse;
 import com.cuongph.be_code.dto.RegisterRequest;
-import jakarta.annotation.security.PermitAll;
+import com.cuongph.be_code.response.ResponseData;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestBody;
@@ -20,14 +19,14 @@ public class AuthController {
     public AuthController(AuthService authService) { this.authService = authService; }
 
     @PostMapping("/register")
-    public ResponseEntity<?> register(@RequestBody RegisterRequest req) {
+    public ResponseData<Object> register(@RequestBody RegisterRequest req) {
         authService.register(req);
-        return ResponseEntity.ok(Map.of("message", "User registered"));
+        return new ResponseData<>().success(Map.of("message", "User registered successfully"));
     }
 
+
     @PostMapping("/login")
-    public ResponseEntity<AuthResponse> login(@RequestBody AuthRequest req) {
-        AuthResponse res = authService.login(req);
-        return ResponseEntity.ok(res);
+    public ResponseData<Object> login(@RequestBody AuthRequest req) {
+        return new ResponseData<>().success(authService.login(req));
     }
 }
