@@ -29,7 +29,7 @@ public class Post {
 
     // Tình trạng bài viết (công khai / riêng tư)
     @Column(nullable = false)
-    private boolean isPublic = true;
+    private Long isPublic ;
 
     // Thời gian tạo
     @Column(nullable = false)

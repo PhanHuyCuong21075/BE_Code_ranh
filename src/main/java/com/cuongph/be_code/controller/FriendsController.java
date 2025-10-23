@@ -1,7 +1,7 @@
 package com.cuongph.be_code.controller;
 
 
-import com.cuongph.be_code.response.ResponseData;
+import com.cuongph.be_code.dto.response.ResponseData;
 import com.cuongph.be_code.service.FriendService;
 import lombok.RequiredArgsConstructor;
 import org.springframework.web.bind.annotation.GetMapping;

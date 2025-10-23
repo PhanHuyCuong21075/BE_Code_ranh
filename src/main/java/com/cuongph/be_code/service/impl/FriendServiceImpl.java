@@ -6,6 +6,7 @@ import com.cuongph.be_code.repo.FriendRepository;
 import com.cuongph.be_code.repo.UserRepository;
 import com.cuongph.be_code.service.FriendService;
 import lombok.RequiredArgsConstructor;
+import org.springframework.security.core.userdetails.UsernameNotFoundException;
 import org.springframework.stereotype.Service;
 
 import java.util.ArrayList;
@@ -39,7 +40,7 @@ public class FriendServiceImpl implements FriendService {
     @Override
     public List<User> suggestFriends(String username) {
         User currentUser = userRepo.findByUsername(username)
-                .orElseThrow(() -> new RuntimeException("User not found: " + username));
+                .orElseThrow(() -> new UsernameNotFoundException("Not found"));
 
         // 1️⃣ Lấy danh sách bạn bè hiện tại
         List<User> currentFriends = getFriends(username);

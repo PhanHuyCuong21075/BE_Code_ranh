@@ -1,4 +1,4 @@
-package com.cuongph.be_code.response;
+package com.cuongph.be_code.dto.response;
 
 
 import lombok.AllArgsConstructor;

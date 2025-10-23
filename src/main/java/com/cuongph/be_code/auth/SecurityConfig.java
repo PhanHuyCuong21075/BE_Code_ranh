@@ -30,7 +30,8 @@ public class SecurityConfig {
     private String corsOrigins;
 
     public SecurityConfig(CustomUserDetailsService uds, JwtUtils jwtUtils) {
-        this.userDetailsService = uds; this.jwtUtils = jwtUtils;
+        this.userDetailsService = uds;
+        this.jwtUtils = jwtUtils;
     }
 
     @Bean
@@ -43,7 +44,8 @@ public class SecurityConfig {
 
     @Bean
     public PasswordEncoder passwordEncoder() {
-        return new BCryptPasswordEncoder(); }
+        return new BCryptPasswordEncoder();
+    }
 
     @Bean
     public SecurityFilterChain filterChain(HttpSecurity http) throws Exception {
@@ -52,11 +54,12 @@ public class SecurityConfig {
         http
                 .cors(cors -> cors.configurationSource(request -> {
                     CorsConfiguration cfg = new CorsConfiguration();
-                    cfg.addAllowedOriginPattern("*");
-                    cfg.setAllowedMethods(List.of("GET","POST","PUT","DELETE","OPTIONS"));
+                    cfg.setAllowedOrigins(List.of("http://localhost:4200")); // ✅ cụ thể domain frontend
+                    cfg.setAllowedMethods(List.of("GET", "POST", "PUT", "DELETE", "OPTIONS"));
                     cfg.setAllowedHeaders(List.of("*"));
-                    cfg.setAllowCredentials(true);
+                    cfg.setAllowCredentials(true); // cho phép cookie/token nếu có
                     return cfg;
+
                 }))
                 .csrf(AbstractHttpConfigurer::disable)
                 .authorizeHttpRequests(auth -> auth
