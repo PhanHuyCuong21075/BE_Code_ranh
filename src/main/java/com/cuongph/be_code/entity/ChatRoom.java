@@ -2,27 +2,26 @@ package com.cuongph.be_code.entity;
 
 import jakarta.persistence.*;
 import lombok.Data;
+import lombok.EqualsAndHashCode;
 
 import java.time.LocalDateTime;
 import java.util.Set;
 
 @Entity
 @Data
+@EqualsAndHashCode(callSuper = false)
 @Table(name = "chat_rooms")
-public class ChatRoom {
+public class ChatRoom extends Base{
 
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;
 
-    // Tên phòng (dùng cho nhóm chat)
     private String name;
 
-    // Thời gian tạo phòng chat
     @Column(nullable = false)
     private LocalDateTime createdAt = LocalDateTime.now();
 
-    // User tham gia phòng chat (many-to-many)
     @ManyToMany
     @JoinTable(
             name = "chat_room_users",

@@ -9,8 +9,8 @@ import org.springframework.web.bind.annotation.ExceptionHandler;
 @ControllerAdvice
 public class GlobalExceptionHandler {
 
-    @ExceptionHandler(AppException.class)
-    public ResponseEntity<ResponseData<Object>> handleAppException(AppException ex, HttpServletRequest request) {
+    @ExceptionHandler(BusinessException.class)
+    public ResponseEntity<ResponseData<Object>> handleAppException(BusinessException ex, HttpServletRequest request) {
         ResponseData<Object> response = new ResponseData<>()
                 .error(ex.getStatus(), ex.getCode(), ex.getMessage())
                 .path(request.getRequestURI());

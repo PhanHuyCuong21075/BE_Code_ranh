@@ -2,13 +2,15 @@ package com.cuongph.be_code.entity;
 
 import jakarta.persistence.*;
 import lombok.Data;
+import lombok.EqualsAndHashCode;
 
 import java.time.LocalDateTime;
 
 @Entity
 @Data
+@EqualsAndHashCode(callSuper = false)
 @Table(name = "comments")
-public class Comment {
+public class Comment extends Base{
 
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
@@ -26,6 +28,10 @@ public class Comment {
 
     @Column(columnDefinition = "TEXT")
     private String content;
+
+    // Ảnh kèm theo bình luận (có thể null)
+    @Column(name = "image_url")
+    private String imageUrl;
 
     @Column(nullable = false)
     private LocalDateTime createdAt = LocalDateTime.now();

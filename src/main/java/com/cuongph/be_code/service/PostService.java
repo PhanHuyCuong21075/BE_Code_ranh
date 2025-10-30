@@ -11,6 +11,9 @@ public interface PostService {
 
     Post createPost(PostRequest request);
 
-
     List<PostResponse> getAllPosts(GetPostRequest request);
+
+    Post updatePost(Long id, PostRequest request);
+
+    void deletePost(Long id);
 }

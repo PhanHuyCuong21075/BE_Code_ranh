@@ -2,14 +2,16 @@ package com.cuongph.be_code.entity;
 
 import jakarta.persistence.*;
 import lombok.Data;
+import lombok.EqualsAndHashCode;
 
 import java.time.LocalDateTime;
 import java.util.Set;
 
 @Entity
 @Data
+@EqualsAndHashCode(callSuper = false)
 @Table(name = "posts")
-public class Post {
+public class Post extends Base{
 
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
@@ -35,4 +37,6 @@ public class Post {
     @Column(nullable = false)
     private LocalDateTime createdAt = LocalDateTime.now();
 
+    @Column(name = "update_at")
+    private LocalDateTime updateAt = LocalDateTime.now();
 }

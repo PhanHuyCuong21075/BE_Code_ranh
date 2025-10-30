@@ -3,6 +3,7 @@ package com.cuongph.be_code.service.impl;
 import com.cuongph.be_code.dto.request.GetPostRequest;
 import com.cuongph.be_code.dto.request.PostRequest;
 import com.cuongph.be_code.dto.response.PostResponse;
+import com.cuongph.be_code.dto.response.ResponseData;
 import com.cuongph.be_code.entity.Friend;
 import com.cuongph.be_code.entity.Post;
 import com.cuongph.be_code.entity.User;
@@ -11,9 +12,12 @@ import com.cuongph.be_code.repo.PostRepository;
 import com.cuongph.be_code.repo.UserRepository;
 import com.cuongph.be_code.service.PostService;
 import lombok.AllArgsConstructor;
+import org.springframework.security.core.Authentication;
+import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.security.core.userdetails.UsernameNotFoundException;
 import org.springframework.stereotype.Service;
 
+import java.time.LocalDateTime;
 import java.util.ArrayList;
 import java.util.Comparator;
 import java.util.List;
@@ -73,6 +77,37 @@ public class PostServiceImpl implements PostService {
                 .sorted(Comparator.comparing(Post::getCreatedAt).reversed())
                 .map(this::convertToResponse)
                 .toList();
+    }
+
+    public Post updatePost(Long id, PostRequest request) {
+        Authentication auth = SecurityContextHolder.getContext().getAuthentication();
+        // Lấy username của người đang đăng nhập
+        String currentUsername = auth.getName();
+
+        Post post = postRepository.findById(id)
+                .orElseThrow(() -> new RuntimeException("Bài viết không tồn tại"));
+        User user = userRepository.findByUsername(currentUsername)
+                .orElseThrow(() -> new UsernameNotFoundException("User not found"));
+
+        post.setUser(user);
+        post.setContent(request.getContent());
+        post.setIsPublic(request.getIsPublic());
+        post.setUpdateAt(LocalDateTime.now());
+        return postRepository.save(post);
+    }
+
+    public void deletePost(Long id) {
+        Authentication auth = SecurityContextHolder.getContext().getAuthentication();
+        // Lấy username của người đang đăng nhập
+        String currentUsername = auth.getName();
+
+        Post post = postRepository.findById(id)
+                .orElseThrow(() -> new RuntimeException("Bài viết không tồn tại"));
+        // Kiểm tra username người đăng vs username bài viết
+        if (!post.getUser().getUsername().equals(currentUsername)) {
+            throw new RuntimeException("Khong the xoa");
+        }
+        postRepository.delete(post);
     }
 
 

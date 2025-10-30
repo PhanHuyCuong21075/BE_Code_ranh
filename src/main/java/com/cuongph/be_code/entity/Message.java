@@ -2,13 +2,15 @@ package com.cuongph.be_code.entity;
 
 import jakarta.persistence.*;
 import lombok.Data;
+import lombok.EqualsAndHashCode;
 
 import java.time.LocalDateTime;
 
 @Entity
 @Data
+@EqualsAndHashCode(callSuper = false)
 @Table(name = "messages")
-public class Message {
+public class Message extends Base{
 
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)

@@ -26,15 +26,18 @@ public class FriendServiceImpl implements FriendService {
     private final UserRepository userRepo;
 
     public List<User> getFriends(String username) {
-        Optional<User> user = userRepo.findByUsername(username);
-        Long userId = user.get().getId();
-        List<Friend> relations = friendRepo.findAcceptedFriends(userId);
+        return userRepo.findByUsername(username)
+                .map(user -> {
+                    Long userId = user.getId();
+                    List<Friend> relations = friendRepo.findAcceptedFriends(userId);
 
-        return relations.stream()
-                .map(f -> f.getRequester().getId().equals(userId)
-                        ? f.getReceiver()
-                        : f.getRequester())
-                .toList();
+                    return relations.stream()
+                            .map(f -> f.getRequester().getId().equals(userId)
+                                    ? f.getReceiver()
+                                    : f.getRequester())
+                            .toList();
+                })
+                .orElse(List.of());
     }
 
     @Override

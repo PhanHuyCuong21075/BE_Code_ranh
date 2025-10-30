@@ -1,4 +1,4 @@
-package com.cuongph.be_code.auth;
+package com.cuongph.be_code.common.auth;
 
 import com.cuongph.be_code.entity.User;
 import com.cuongph.be_code.repo.UserRepository;

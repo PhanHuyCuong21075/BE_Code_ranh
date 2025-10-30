@@ -1,8 +1,8 @@
 package com.cuongph.be_code.controller;
 
-import com.cuongph.be_code.auth.AuthService;
-import com.cuongph.be_code.dto.AuthRequest;
-import com.cuongph.be_code.dto.RegisterRequest;
+import com.cuongph.be_code.common.auth.AuthService;
+import com.cuongph.be_code.dto.response.auth.AuthRequest;
+import com.cuongph.be_code.dto.response.auth.RegisterRequest;
 import com.cuongph.be_code.dto.response.ResponseData;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestBody;

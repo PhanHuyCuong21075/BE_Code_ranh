@@ -5,35 +5,34 @@ import jakarta.persistence.Entity;
 import jakarta.persistence.GeneratedValue;
 import jakarta.persistence.GenerationType;
 import jakarta.persistence.Id;
-import jakarta.persistence.JoinColumn;
-import jakarta.persistence.JoinTable;
-import jakarta.persistence.ManyToMany;
 import jakarta.persistence.Table;
 import lombok.Data;
 import lombok.EqualsAndHashCode;
 
-import java.util.HashSet;
-import java.util.Set;
-
 @Entity
 @Data
 @EqualsAndHashCode(callSuper = false)
-@Table(name = "users")
-public class User extends Base{
+@Table(name = "user_detail")
+public class UserDetail extends Base{
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;
 
-    @Column(unique = true, nullable = false, length = 100)
-    private String username;
+    @Column(name = "user_name")
+    private String userName;
 
-    @Column(nullable = false)
-    private String password;
+    @Column(name = "full_name")
+    private String fullName;
 
-    @Column(nullable = false)
+    @Column(name = "phone")
+    private String phone;
+
+    @Column(name = "email")
     private String email;
 
-    @Column(nullable = false)
-    private String role = "USER";
+    @Column(name = "gender")
+    private String gender;
 
+    @Column(name = "file_path_avatar")
+    private String filePathAvatar;
 }
