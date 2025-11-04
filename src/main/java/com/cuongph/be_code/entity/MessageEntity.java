@@ -9,30 +9,32 @@ import java.time.LocalDateTime;
 @Entity
 @Data
 @EqualsAndHashCode(callSuper = false)
-@Table(name = "comments")
-public class Comment extends Base{
+@Table(name = "messages")
+public class MessageEntity extends BaseEntity {
 
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;
 
-    // Người bình luận
     @ManyToOne(fetch = FetchType.LAZY)
-    @JoinColumn(name = "user_id", nullable = false)
-    private User user;
+    @JoinColumn(name = "chat_room_id", nullable = false)
+    private ChatRoomEntity chatRoomEntity;
 
-    // Bài viết bình luận
     @ManyToOne(fetch = FetchType.LAZY)
-    @JoinColumn(name = "post_id", nullable = false)
-    private Post post;
+    @JoinColumn(name = "sender_id", nullable = false)
+    private User sender;
 
-    @Column(columnDefinition = "TEXT")
+    @Column(columnDefinition = "TEXT", nullable = false)
     private String content;
 
-    // Ảnh kèm theo bình luận (có thể null)
-    @Column(name = "image_url")
     private String imageUrl;
 
     @Column(nullable = false)
-    private LocalDateTime createdAt = LocalDateTime.now();
+    private LocalDateTime sentAt;
+
+    private boolean read = false;
+
+    public MessageEntity() {
+        this.sentAt = LocalDateTime.now();
+    }
 }

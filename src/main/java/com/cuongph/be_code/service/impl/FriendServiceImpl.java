@@ -1,6 +1,6 @@
 package com.cuongph.be_code.service.impl;
 
-import com.cuongph.be_code.entity.Friend;
+import com.cuongph.be_code.entity.FriendEntity;
 import com.cuongph.be_code.entity.User;
 import com.cuongph.be_code.repo.FriendRepository;
 import com.cuongph.be_code.repo.UserRepository;
@@ -13,7 +13,6 @@ import java.util.ArrayList;
 import java.util.Collections;
 import java.util.HashSet;
 import java.util.List;
-import java.util.Optional;
 import java.util.Set;
 import java.util.stream.Collectors;
 
@@ -29,7 +28,7 @@ public class FriendServiceImpl implements FriendService {
         return userRepo.findByUsername(username)
                 .map(user -> {
                     Long userId = user.getId();
-                    List<Friend> relations = friendRepo.findAcceptedFriends(userId);
+                    List<FriendEntity> relations = friendRepo.findAcceptedFriends(userId);
 
                     return relations.stream()
                             .map(f -> f.getRequester().getId().equals(userId)

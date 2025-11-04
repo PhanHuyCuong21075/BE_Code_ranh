@@ -1,8 +1,8 @@
 package com.cuongph.be_code.controller;
 
 import com.cuongph.be_code.common.auth.AuthService;
-import com.cuongph.be_code.dto.response.auth.AuthRequest;
-import com.cuongph.be_code.dto.response.auth.RegisterRequest;
+import com.cuongph.be_code.dto.auth.AuthRequest;
+import com.cuongph.be_code.dto.auth.RegisterRequest;
 import com.cuongph.be_code.dto.response.ResponseData;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestBody;
@@ -14,6 +14,8 @@ import java.util.Map;
 @RestController
 @RequestMapping("/api/auth")
 public class AuthController {
+
+
     private final AuthService authService;
     public AuthController(AuthService authService) { this.authService = authService; }
 

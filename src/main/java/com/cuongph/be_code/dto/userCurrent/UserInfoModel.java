@@ -1,5 +1,6 @@
 package com.cuongph.be_code.dto.userCurrent;
 
+import com.cuongph.be_code.common.enums.ETokenType;
 import lombok.Data;
 
 import java.io.Serializable;
@@ -20,4 +21,6 @@ public class UserInfoModel implements Serializable {
     //    private List<MenuModel> menus;
     private ETokenType eTokenType;
     private Long twoFactor;
+
+
 }

@@ -11,7 +11,7 @@ import java.util.Set;
 @Data
 @EqualsAndHashCode(callSuper = false)
 @Table(name = "chat_rooms")
-public class ChatRoom extends Base{
+public class ChatRoomEntity extends BaseEntity {
 
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)

@@ -3,9 +3,8 @@ package com.cuongph.be_code.service.impl;
 import com.cuongph.be_code.dto.request.GetPostRequest;
 import com.cuongph.be_code.dto.request.PostRequest;
 import com.cuongph.be_code.dto.response.PostResponse;
-import com.cuongph.be_code.dto.response.ResponseData;
-import com.cuongph.be_code.entity.Friend;
-import com.cuongph.be_code.entity.Post;
+import com.cuongph.be_code.entity.FriendEntity;
+import com.cuongph.be_code.entity.PostEntity;
 import com.cuongph.be_code.entity.User;
 import com.cuongph.be_code.repo.FriendRepository;
 import com.cuongph.be_code.repo.PostRepository;
@@ -31,16 +30,16 @@ public class PostServiceImpl implements PostService {
     private final UserRepository userRepository;
 
     @Override
-    public Post createPost(PostRequest request) {
+    public PostEntity createPost(PostRequest request) {
         User user = userRepository.findByUsername(request.getUsername())
                 .orElseThrow(() -> new UsernameNotFoundException("Not found"));
 
-        Post post = new Post();
-        post.setUser(user);
-        post.setContent(request.getContent());
-        post.setImageUrl(request.getImageUrl());
-        post.setIsPublic(request.getIsPublic());
-        return postRepository.save(post);
+        PostEntity postEntity = new PostEntity();
+        postEntity.setUser(user);
+        postEntity.setContent(request.getContent());
+        postEntity.setImageUrl(request.getImageUrl());
+        postEntity.setIsPublic(request.getIsPublic());
+        return postRepository.save(postEntity);
     }
 
     @Override
@@ -48,11 +47,11 @@ public class PostServiceImpl implements PostService {
         User user = userRepository.findByUsername(request.getUsername())
                 .orElseThrow(() -> new UsernameNotFoundException("User not found"));
 
-        List<Friend> friends = friendRepository.findAcceptedFriends(user.getId());
+        List<FriendEntity> friendEntities = friendRepository.findAcceptedFriends(user.getId());
 
         List<Long> friendIds = new ArrayList<>();
-        if (friends != null && !friends.isEmpty()) {
-            for (Friend f : friends) {
+        if (friendEntities != null && !friendEntities.isEmpty()) {
+            for (FriendEntity f : friendEntities) {
                 if (!f.getRequester().getId().equals(user.getId())) {
                     friendIds.add(f.getRequester().getId());
                 }
@@ -62,38 +61,38 @@ public class PostServiceImpl implements PostService {
             }
         }
 
-        List<Post> posts;
+        List<PostEntity> postEntities;
 
         if (!friendIds.isEmpty()) {
             // ✅ Có bạn bè → Lấy bài của user + bạn bè (ưu tiên công khai hoặc chính họ)
-            posts = postRepository.findPostsByUserIds(friendIds, user.getId());
+            postEntities = postRepository.findPostsByUserIds(friendIds, user.getId());
         } else {
             // ✅ Không có bạn bè → Lấy bài công khai + bài của chính mình
-            posts = postRepository.findAllPublicPostsAndUser(user.getId());
+            postEntities = postRepository.findAllPublicPostsAndUser(user.getId());
         }
 
         // ✅ Chuyển sang DTO + sắp xếp mới nhất đến cũ
-        return posts.stream()
-                .sorted(Comparator.comparing(Post::getCreatedAt).reversed())
+        return postEntities.stream()
+                .sorted(Comparator.comparing(PostEntity::getCreatedAt).reversed())
                 .map(this::convertToResponse)
                 .toList();
     }
 
-    public Post updatePost(Long id, PostRequest request) {
+    public PostEntity updatePost(Long id, PostRequest request) {
         Authentication auth = SecurityContextHolder.getContext().getAuthentication();
         // Lấy username của người đang đăng nhập
         String currentUsername = auth.getName();
 
-        Post post = postRepository.findById(id)
+        PostEntity postEntity = postRepository.findById(id)
                 .orElseThrow(() -> new RuntimeException("Bài viết không tồn tại"));
         User user = userRepository.findByUsername(currentUsername)
                 .orElseThrow(() -> new UsernameNotFoundException("User not found"));
 
-        post.setUser(user);
-        post.setContent(request.getContent());
-        post.setIsPublic(request.getIsPublic());
-        post.setUpdateAt(LocalDateTime.now());
-        return postRepository.save(post);
+        postEntity.setUser(user);
+        postEntity.setContent(request.getContent());
+        postEntity.setIsPublic(request.getIsPublic());
+        postEntity.setUpdateAt(LocalDateTime.now());
+        return postRepository.save(postEntity);
     }
 
     public void deletePost(Long id) {
@@ -101,23 +100,23 @@ public class PostServiceImpl implements PostService {
         // Lấy username của người đang đăng nhập
         String currentUsername = auth.getName();
 
-        Post post = postRepository.findById(id)
+        PostEntity postEntity = postRepository.findById(id)
                 .orElseThrow(() -> new RuntimeException("Bài viết không tồn tại"));
         // Kiểm tra username người đăng vs username bài viết
-        if (!post.getUser().getUsername().equals(currentUsername)) {
+        if (!postEntity.getUser().getUsername().equals(currentUsername)) {
             throw new RuntimeException("Khong the xoa");
         }
-        postRepository.delete(post);
+        postRepository.delete(postEntity);
     }
 
 
-    private PostResponse convertToResponse(Post post) {
+    private PostResponse convertToResponse(PostEntity postEntity) {
         PostResponse response = new PostResponse();
-        response.setId(post.getId());
-        response.setAuthor(post.getUser().getUsername());
-        response.setContent(post.getContent());
-        response.setIsPublic(post.getIsPublic());
-        response.setTime(post.getCreatedAt().toString());
+        response.setId(postEntity.getId());
+        response.setAuthor(postEntity.getUser().getUsername());
+        response.setContent(postEntity.getContent());
+        response.setIsPublic(postEntity.getIsPublic());
+        response.setTime(postEntity.getCreatedAt().toString());
         return response;
     }
 

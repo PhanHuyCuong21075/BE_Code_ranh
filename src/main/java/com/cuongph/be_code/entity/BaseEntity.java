@@ -14,10 +14,10 @@ import java.util.Date;
 
 @Data
 @MappedSuperclass
-public class Base {
+public abstract class BaseEntity {
 
     @Column(name = "is_active")
-    protected Long isActive;
+    protected Long isActive = 1L;
 
     @CreatedDate
     @Temporal(TemporalType.TIMESTAMP)
