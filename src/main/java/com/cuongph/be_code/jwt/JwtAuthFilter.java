@@ -17,9 +17,9 @@ import java.util.stream.Collectors;
 /**
  * ✅ JwtAuthFilter: Kiểm tra JWT trên mỗi request (chạy 1 lần/request).
  * Mục đích:
- *  - Đọc token từ header "Authorization"
- *  - Xác thực token hợp lệ
- *  - Gắn thông tin user (username + roles) vào SecurityContext để Spring Security nhận diện
+ * - Đọc token từ header "Authorization"
+ * - Xác thực token hợp lệ
+ * - Gắn thông tin user (username + roles) vào SecurityContext để Spring Security nhận diện
  */
 public class JwtAuthFilter extends OncePerRequestFilter {
 
@@ -40,10 +40,14 @@ public class JwtAuthFilter extends OncePerRequestFilter {
         String path = req.getServletPath();
 
         // ✅ 2. Bỏ qua filter cho các endpoint public như /api/auth/**
-        if (path.startsWith("/api/auth/")) {
-            chain.doFilter(req, res);
-            return;
+        List<String> publicPaths = List.of("/api/auth/", "/api/role/list/");
+        for (String p : publicPaths) {
+            if (path.startsWith(p)) {
+                chain.doFilter(req, res);
+                return;
+            }
         }
+
 
         // ✅ 3. Lấy Authorization header
         String header = req.getHeader("Authorization");

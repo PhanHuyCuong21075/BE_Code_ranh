@@ -45,7 +45,7 @@ public class SecurityConfig {
         http
                 .cors(cors -> cors.configurationSource(request -> {
                     CorsConfiguration cfg = new CorsConfiguration();
-                    cfg.setAllowedOrigins(List.of(corsOrigins.split(",")));
+                    cfg.setAllowedOriginPatterns(List.of("*")); // dùng patterns thay cho allowedOrigins
                     cfg.setAllowedMethods(List.of("GET", "POST", "PUT", "DELETE", "OPTIONS"));
                     cfg.setAllowedHeaders(List.of("*"));
                     cfg.setAllowCredentials(true);
@@ -54,6 +54,7 @@ public class SecurityConfig {
                 .csrf(AbstractHttpConfigurer::disable)
                 .authorizeHttpRequests(auth -> auth
                         .requestMatchers("/api/auth/**").permitAll()
+                        .requestMatchers("/api/role/list").permitAll()
                         .anyRequest().authenticated()
                 )
                 .sessionManagement(sess -> sess.sessionCreationPolicy(SessionCreationPolicy.STATELESS));
