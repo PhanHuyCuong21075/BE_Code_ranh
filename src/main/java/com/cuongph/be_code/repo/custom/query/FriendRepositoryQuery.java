@@ -2,14 +2,25 @@ package com.cuongph.be_code.repo.custom.query;
 
 public class FriendRepositoryQuery {
 
-    // Query lấy danh sách bạn bè đã chấp nhận
+    /**
+     * Truy vấn danh sách bạn bè đã được chấp nhận (status = 'ACCEPTED')
+     * của một người dùng cụ thể (userId).
+     *
+     * - Nếu user là người gửi (requester) → bạn là receiver
+     * - Nếu user là người nhận (receiver) → bạn là requester
+     */
     protected String sqlFindAcceptedFriends() {
         StringBuilder sql = new StringBuilder();
-        sql.append("SELECT f.* FROM friend f ");
-        sql.append("WHERE f.status = 'ACCEPTED' ");
-        sql.append("AND (f.requester_id = :userId OR f.receiver_id = :userId)");
+
+        // Lấy tất cả các bản ghi trong bảng friends (đã được chấp nhận)
+        sql.append("SELECT f.* ")
+                .append("FROM friends f ")
+                .append("WHERE f.status = 'ACCEPTED' ")
+                .append("AND (f.requester_id = :userId OR f.receiver_id = :userId)");
+
         return sql.toString();
     }
+
 
     // Query kiểm tra mối quan hệ giữa 2 user
     protected String sqlFindRelation() {

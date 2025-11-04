@@ -4,13 +4,11 @@ import jakarta.persistence.*;
 import lombok.Data;
 import lombok.EqualsAndHashCode;
 
-import java.util.List;
-
 @Entity
 @Data
 @EqualsAndHashCode(callSuper = true)
 @Table(name = "users")
-public class User extends BaseEntity {
+public class UserEntity extends BaseEntity {
 
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
@@ -24,8 +22,4 @@ public class User extends BaseEntity {
 
     @Column(nullable = false, unique = true)
     private String email;
-
-    // Một user có thể có nhiều user_role mapping
-    @OneToMany(mappedBy = "user", cascade = CascadeType.ALL, fetch = FetchType.LAZY)
-    private List<UserRoleEntity> userRoles;
 }

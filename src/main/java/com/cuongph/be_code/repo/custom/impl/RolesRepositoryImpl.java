@@ -6,9 +6,10 @@ import com.cuongph.be_code.repo.custom.query.RolesQuery;
 import jakarta.persistence.EntityManager;
 import jakarta.persistence.Query;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.stereotype.Repository;
 
 import java.util.List;
-
+@Repository
 public class RolesRepositoryImpl extends RolesQuery implements RolesRepositoryCustom {
     @Autowired
     private EntityManager entityManager;

@@ -1,10 +1,10 @@
 package com.cuongph.be_code.service;
 
-import com.cuongph.be_code.entity.User;
+import com.cuongph.be_code.entity.UserEntity;
 
 import java.util.Optional;
 
 public interface UsersService {
-    Optional<User> getByUserName(String userName);
+    Optional<UserEntity> getByUserName(String userName);
 
 }

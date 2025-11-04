@@ -16,20 +16,15 @@ public class CommentEntity extends BaseEntity {
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;
 
-    // Người bình luận
-    @ManyToOne(fetch = FetchType.LAZY)
-    @JoinColumn(name = "user_id", nullable = false)
-    private User user;
+    @Column(name = "user_id", nullable = false)
+    private Long userId;
 
-    // Bài viết bình luận
-    @ManyToOne(fetch = FetchType.LAZY)
-    @JoinColumn(name = "post_id", nullable = false)
-    private PostEntity postEntity;
+    @Column(name = "post_id", nullable = false)
+    private Long postId;
 
     @Column(columnDefinition = "TEXT")
     private String content;
 
-    // Ảnh kèm theo bình luận (có thể null)
     @Column(name = "image_url")
     private String imageUrl;
 

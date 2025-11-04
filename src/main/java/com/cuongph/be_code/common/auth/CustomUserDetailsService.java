@@ -1,8 +1,11 @@
 package com.cuongph.be_code.common.auth;
 
-import com.cuongph.be_code.entity.User;
+import com.cuongph.be_code.entity.RoleEntity;
+import com.cuongph.be_code.entity.UserEntity;
 import com.cuongph.be_code.entity.UserRoleEntity;
+import com.cuongph.be_code.repo.RolesRepository;
 import com.cuongph.be_code.repo.UserRepository;
+import com.cuongph.be_code.repo.UserRoleRepository;
 import lombok.RequiredArgsConstructor;
 import org.springframework.security.core.GrantedAuthority;
 import org.springframework.security.core.authority.SimpleGrantedAuthority;
@@ -19,24 +22,35 @@ import java.util.stream.Collectors;
 public class CustomUserDetailsService implements UserDetailsService {
 
     private final UserRepository userRepository;
+    private final UserRoleRepository userRoleRepository;
+    private final RolesRepository roleRepository;
 
     @Override
     public UserDetails loadUserByUsername(String username) throws UsernameNotFoundException {
-        // Lấy user theo username
-        User user = userRepository.findByUsername(username)
+        // 1️⃣ Lấy user
+        UserEntity userEntity = userRepository.findByUsername(username)
                 .orElseThrow(() -> new UsernameNotFoundException("User not found: " + username));
 
-        // Lấy danh sách role từ userRoleEntity
-        List<GrantedAuthority> authorities = user.getUserRoles()
-                .stream()
-                .map(UserRoleEntity::getRole)
-                .map(role -> new SimpleGrantedAuthority("ROLE_" + role.getCode().toUpperCase()))
-                .collect(Collectors.toList());
+        // 2️⃣ Lấy danh sách UserRoleEntity theo userId
+        List<UserRoleEntity> userRoles = userRoleRepository.findByUserId(userEntity.getId());
 
-        // Trả về UserDetails của Spring Security
+        // 3️⃣ Lấy danh sách roleId từ userRoles
+        List<Long> roleIds = userRoles.stream()
+                .map(UserRoleEntity::getRoleId)
+                .toList();
+
+        // 4️⃣ Lấy RoleEntity theo roleIds
+        List<RoleEntity> roles = roleRepository.findAllById(roleIds);
+
+        // 5️⃣ Map RoleEntity -> GrantedAuthority
+        List<SimpleGrantedAuthority> authorities = roles.stream()
+                .map(role -> new SimpleGrantedAuthority("ROLE_" + role.getCode().toUpperCase()))
+                .toList();
+
+        // 6️⃣ Trả về UserDetails cho Spring Security
         return new org.springframework.security.core.userdetails.User(
-                user.getUsername(),
-                user.getPassword(),
+                userEntity.getUsername(),
+                userEntity.getPassword(),
                 authorities
         );
     }

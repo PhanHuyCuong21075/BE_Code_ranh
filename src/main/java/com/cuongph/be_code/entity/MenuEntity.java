@@ -3,10 +3,8 @@ package com.cuongph.be_code.entity;
 import jakarta.persistence.*;
 import lombok.Data;
 
-import java.util.List;
-
-@Data
 @Entity
+@Data
 @Table(name = "menus")
 public class MenuEntity {
 
@@ -20,9 +18,6 @@ public class MenuEntity {
     @Column(nullable = false)
     private String path;
 
-    @Column(nullable = true)
+    @Column
     private String icon;
-
-    @OneToMany(mappedBy = "menu", cascade = CascadeType.ALL, fetch = FetchType.LAZY)
-    private List<RoleMenuEntity> roleMenus;
 }

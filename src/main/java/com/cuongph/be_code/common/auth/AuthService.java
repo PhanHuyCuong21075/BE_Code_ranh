@@ -4,7 +4,7 @@ import com.cuongph.be_code.dto.auth.AuthRequest;
 import com.cuongph.be_code.dto.auth.AuthResponse;
 import com.cuongph.be_code.dto.auth.RegisterRequest;
 import com.cuongph.be_code.entity.RoleEntity;
-import com.cuongph.be_code.entity.User;
+import com.cuongph.be_code.entity.UserEntity;
 import com.cuongph.be_code.entity.UserRoleEntity;
 import com.cuongph.be_code.exception.BusinessException;
 import com.cuongph.be_code.jwt.JwtUtils;
@@ -73,12 +73,12 @@ public class AuthService {
             String token = jwtUtils.generateToken(userDetails.getUsername(), roles);
 
             // ✅ Lấy entity để trả thêm info
-            User user = userRepository.findByUsername(req.username())
+            UserEntity userEntity = userRepository.findByUsername(req.username())
                     .orElseThrow(() -> new UsernameNotFoundException("User not found"));
 
             // Ghép lại response
             String rolesStr = String.join(",", roles);
-            return new AuthResponse(token, user.getUsername(), rolesStr);
+            return new AuthResponse(token, userEntity.getUsername(), rolesStr);
 
         } catch (BadCredentialsException ex) {
             throw new BusinessException("Invalid credentials", "INVALID_CREDENTIALS", 401);
@@ -102,19 +102,19 @@ public class AuthService {
         }
 
         // Tạo user mới
-        User user = new User();
-        user.setUsername(req.username());
-        user.setPassword(encoder.encode(req.password()));
-        user.setEmail(req.email());
-        userRepository.save(user);
+        UserEntity userEntity = new UserEntity();
+        userEntity.setUsername(req.username());
+        userEntity.setPassword(encoder.encode(req.password()));
+        userEntity.setEmail(req.email());
+        userRepository.save(userEntity);
 
         // Gán role mặc định "USER"
         RoleEntity defaultRole = roleRepository.findByCode("USER")
                 .orElseThrow(() -> new BusinessException("Default role not found", "ROLE_NOT_FOUND", 500));
 
         UserRoleEntity userRole = new UserRoleEntity();
-        userRole.setUser(user);
-        userRole.setRole(defaultRole);
+        userRole.setUserId(userEntity.getId());
+        userRole.setRoleId(defaultRole.getId());
         userRoleRepository.save(userRole);
     }
 }

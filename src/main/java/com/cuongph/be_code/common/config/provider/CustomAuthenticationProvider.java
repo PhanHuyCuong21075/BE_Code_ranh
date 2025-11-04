@@ -6,7 +6,7 @@ import com.cuongph.be_code.common.enums.EActiveStatus;
 import com.cuongph.be_code.common.enums.ETokenType;
 import com.cuongph.be_code.dto.userCurrent.UserDetailModel;
 import com.cuongph.be_code.dto.userCurrent.UserInfoModel;
-import com.cuongph.be_code.entity.User;
+import com.cuongph.be_code.entity.UserEntity;
 import com.cuongph.be_code.entity.UserDetailEntity;
 import com.cuongph.be_code.repo.RolesRepository;
 import com.cuongph.be_code.repo.UserDetailRepository;
@@ -70,7 +70,7 @@ public class CustomAuthenticationProvider implements AuthenticationProvider {
         return new Date(new Date().getTime() + appProperties.jwtCheckValidity);
     }
 
-    private boolean authenticated(User users, String password) {
+    private boolean authenticated(UserEntity users, String password) {
         if (!appProperties.devMode) {
             boolean checkPass = encoder.matches(password, users.getPassword());
 
@@ -85,38 +85,39 @@ public class CustomAuthenticationProvider implements AuthenticationProvider {
         String username = authentication.getName().toLowerCase().trim();
         String password = authentication.getCredentials().toString();
 
-        Optional<User> userOpt = usersService.getByUserName(username);
+        Optional<UserEntity> userOpt = usersService.getByUserName(username);
 
         // 1. Kiểm tra user có tồn tại không
         if (userOpt.isEmpty()) {
             throw new CustomAuthenticationException("USER_NOT_FOUND");
         }
 
-        User user = userOpt.get();
+        UserEntity userEntity = userOpt.get();
 
         // 2. Kiểm tra trạng thái hoạt động
-        if (!Objects.equals(EActiveStatus.ACTIVE.value, user.getIsActive())) {
+        if (!Objects.equals(EActiveStatus.ACTIVE.value, userEntity.getIsActive())) {
             throw new CustomAuthenticationException("ACCOUNT_INACTIVE");
         }
 
         // 3. Kiểm tra mật khẩu
-        if (!authenticated(user, password)) {
+        if (!authenticated(userEntity, password)) {
             throw new CustomAuthenticationException("INVALID_PASSWORD");
         }
 
         // 4. Lấy quyền (role)
-        List<String> roleCodes = rolesRepo.getRoleCodeByUserName(user.getUsername());
+        List<String> roleCodes = rolesRepo.getRoleCodeByUserName(userEntity.getUsername());
         var authorities = roleCodes.stream()
                 .map(SimpleGrantedAuthority::new)
                 .collect(Collectors.toList());
 
-        // 5. Chuẩn bị thông tin người dùng trả về
-        List<String> scopes = new ArrayList<>();
-        UserDetailEntity userDetailEntity = userDetailRepo.findByUserName(username);
+        // 5. Lấy user detail bằng userId
+        UserDetailEntity userDetailEntity = userDetailRepo.findByUserId(userEntity.getId());
 
+        // 6. Chuẩn bị thông tin người dùng trả về
+        List<String> scopes = new ArrayList<>();
         UserInfoModel userInfoDTO = new UserInfoModel();
-        userInfoDTO.setId(user.getId());
-        userInfoDTO.setUserName(user.getUsername());
+        userInfoDTO.setId(userEntity.getId());
+        userInfoDTO.setUserName(userEntity.getUsername());
         userInfoDTO.setExpireAt(expireAt(ETokenType.ACCESS_TOKEN));
         userInfoDTO.setETokenType(ETokenType.ACCESS_TOKEN);
         userInfoDTO.setScopes(scopes);
@@ -127,7 +128,7 @@ public class CustomAuthenticationProvider implements AuthenticationProvider {
             userInfoDTO.setUserDetail(ModelMapperUtils.toObject(userDetailEntity, UserDetailModel.class));
         }
 
-        // 6. Trả kết quả xác thực
+        // 7. Trả kết quả xác thực
         String principalJson = new Gson().toJson(userInfoDTO);
         return new UsernamePasswordAuthenticationToken(principalJson, password, authorities);
     }

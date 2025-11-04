@@ -12,13 +12,9 @@ public class RoleMenuEntity {
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;
 
-    // FK tới role
-    @ManyToOne(fetch = FetchType.LAZY)
-    @JoinColumn(name = "role_id", nullable = false)
-    private RoleEntity role;
+    @Column(name = "role_id", nullable = false)
+    private Long roleId;
 
-    // FK tới menu
-    @ManyToOne(fetch = FetchType.LAZY)
-    @JoinColumn(name = "menu_id", nullable = false)
-    private MenuEntity menu;
+    @Column(name = "menu_id", nullable = false)
+    private Long menuId;
 }

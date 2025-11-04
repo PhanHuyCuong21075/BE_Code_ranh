@@ -16,23 +16,18 @@ public class PostEntity extends BaseEntity {
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;
 
-    // Người tạo bài viết
-    @ManyToOne(fetch = FetchType.LAZY)
-    @JoinColumn(name = "user_id", nullable = false)
-    private User user;
+    // ref ID tới user
+    @Column(name = "user_id", nullable = false)
+    private Long userId;
 
-    // Nội dung text
     @Column(columnDefinition = "TEXT")
     private String content;
 
-    // Link ảnh (MinIO / S3)
     private String imageUrl;
 
-    // Tình trạng bài viết (công khai / riêng tư)
     @Column(nullable = false)
-    private Long isPublic ;
+    private Long isPublic;
 
-    // Thời gian tạo
     @Column(nullable = false)
     private LocalDateTime createdAt = LocalDateTime.now();
 

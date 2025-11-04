@@ -2,6 +2,7 @@ package com.cuongph.be_code.entity;
 
 import jakarta.persistence.*;
 import lombok.Data;
+
 import java.time.LocalDateTime;
 
 @Entity
@@ -13,15 +14,13 @@ public class FriendEntity {
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;
 
-    // Người gửi lời mời kết bạn
-    @ManyToOne
-    @JoinColumn(name = "requester_id", nullable = false)
-    private User requester;
+    // Người gửi lời mời
+    @Column(name = "requester_id", nullable = false)
+    private Long requesterId;
 
     // Người nhận lời mời
-    @ManyToOne
-    @JoinColumn(name = "receiver_id", nullable = false)
-    private User receiver;
+    @Column(name = "receiver_id", nullable = false)
+    private Long receiverId;
 
     // Trạng thái: PENDING, ACCEPTED, REJECTED, BLOCKED
     @Column(nullable = false, length = 20)

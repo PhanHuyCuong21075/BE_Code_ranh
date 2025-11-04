@@ -2,7 +2,7 @@ package com.cuongph.be_code.repo.custom.impl;
 
 import com.cuongph.be_code.common.ws.SqlQueryUtil;
 import com.cuongph.be_code.entity.FriendEntity;
-import com.cuongph.be_code.entity.User;
+import com.cuongph.be_code.entity.UserEntity;
 import com.cuongph.be_code.repo.custom.FriendRepositoryCustom;
 import com.cuongph.be_code.repo.custom.query.FriendRepositoryQuery;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -36,9 +36,9 @@ public class FriendRepositoryImpl extends FriendRepositoryQuery implements Frien
     }
 
     @Override
-    public List<User> findFriendsByUsername(String username) {
+    public List<UserEntity> findFriendsByUsername(String username) {
         Map<String, Object> params = new HashMap<>();
         params.put("username", username);
-        return sqlQueryUtil.queryForList(sqlFindFriendsByUsername(), params, User.class);
+        return sqlQueryUtil.queryForList(sqlFindFriendsByUsername(), params, UserEntity.class);
     }
 }

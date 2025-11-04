@@ -5,7 +5,6 @@ import lombok.Data;
 import lombok.EqualsAndHashCode;
 
 import java.io.Serializable;
-import java.util.List;
 
 @Data
 @Entity
@@ -27,11 +26,4 @@ public class RoleEntity implements Serializable {
 
     @Column(name = "description")
     private String description;
-
-    // mapping ngược lại
-    @OneToMany(mappedBy = "role", cascade = CascadeType.ALL, fetch = FetchType.LAZY)
-    private List<UserRoleEntity> userRoles;
-
-    @OneToMany(mappedBy = "role", cascade = CascadeType.ALL, fetch = FetchType.LAZY)
-    private List<RoleMenuEntity> roleMenus;
 }
