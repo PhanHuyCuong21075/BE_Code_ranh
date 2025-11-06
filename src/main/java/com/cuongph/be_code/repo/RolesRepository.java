@@ -9,7 +9,7 @@ import java.util.List;
 import java.util.Optional;
 
 public interface RolesRepository extends JpaRepository<RoleEntity, Long>, RolesRepositoryCustom {
-    List<String> getRoleCodeByUserName(String userName);
+    List<String> getRoleCodeByUserId(Long userId);
 
     Optional<RoleEntity> findByCode(String code);
 }

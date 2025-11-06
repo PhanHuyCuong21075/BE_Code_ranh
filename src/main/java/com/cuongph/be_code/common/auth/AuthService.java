@@ -15,6 +15,7 @@ import org.springframework.security.authentication.AuthenticationManager;
 import org.springframework.security.authentication.BadCredentialsException;
 import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
 import org.springframework.security.core.Authentication;
+import org.springframework.security.core.GrantedAuthority;
 import org.springframework.security.core.userdetails.UserDetails;
 import org.springframework.security.core.userdetails.UsernameNotFoundException;
 import org.springframework.security.crypto.password.PasswordEncoder;
@@ -57,26 +58,29 @@ public class AuthService {
         }
 
         try {
+            // 1. Quá trình xác thực vẫn diễn ra
             Authentication auth = authManager.authenticate(
                     new UsernamePasswordAuthenticationToken(req.username(), req.password())
             );
 
-            UserDetails userDetails = (UserDetails) auth.getPrincipal();
-
-            // ✅ Convert authorities (Collection<GrantedAuthority>) → List<String>
-            List<String> roles = userDetails.getAuthorities()
+            // 2. LẤY QUYỀN TRỰC TIẾP TỪ 'auth' (KHÔNG CẦN DÙNG principal)
+            // auth.getAuthorities() đã được CustomAuthenticationProvider
+            // gán chính xác (new SimpleGrantedAuthority(roleCode))
+            List<String> roles = auth.getAuthorities()
                     .stream()
-                    .map(a -> a.getAuthority()) // Lấy tên quyền
+                    .map(GrantedAuthority::getAuthority) // Lấy tên quyền (role code)
                     .collect(Collectors.toList());
 
-            // ✅ Sinh token chuẩn
-            String token = jwtUtils.generateToken(userDetails.getUsername(), roles);
+            // 3. SINH TOKEN
+            // Bạn đã có username từ request (req.username())
+            // Bạn đã có roles từ bước trên
+            String token = jwtUtils.generateToken(req.username(), roles);
 
-            // ✅ Lấy entity để trả thêm info
+            // 4. LẤY ENTITY ĐỂ TRẢ THÊM INFO (Giữ nguyên logic của bạn)
             UserEntity userEntity = userRepository.findByUsername(req.username())
                     .orElseThrow(() -> new UsernameNotFoundException("User not found"));
 
-            // Ghép lại response
+            // 5. GHÉP LẠI RESPONSE
             String rolesStr = String.join(",", roles);
             return new AuthResponse(token, userEntity.getUsername(), rolesStr);
 
@@ -84,7 +88,6 @@ public class AuthService {
             throw new BusinessException("Invalid credentials", "INVALID_CREDENTIALS", 401);
         }
     }
-
 
     // ✅ Đăng ký: tạo user + gán role mặc định
     @Transactional
@@ -109,7 +112,7 @@ public class AuthService {
         userRepository.save(userEntity);
 
         // Gán role mặc định "USER"
-        RoleEntity defaultRole = roleRepository.findByCode("USER")
+        RoleEntity defaultRole = roleRepository.findByCode(req.roleCode())
                 .orElseThrow(() -> new BusinessException("Default role not found", "ROLE_NOT_FOUND", 500));
 
         UserRoleEntity userRole = new UserRoleEntity();

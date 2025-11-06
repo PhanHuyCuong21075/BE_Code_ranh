@@ -18,9 +18,9 @@ public class RolesRepositoryImpl extends RolesQuery implements RolesRepositoryCu
     private SqlQueryUtil sqlQueryUtil;
 
     @Override
-    public List<String> getRoleCodeByUserName(String userName) {
+    public List<String> getRoleCodeByUserId(Long userId) {
         Query query = entityManager.createNativeQuery(sqlRoleByUserName());
-        query.setParameter("userName", userName);
+        query.setParameter("userId", userId);
 
         return query.getResultList();
     }

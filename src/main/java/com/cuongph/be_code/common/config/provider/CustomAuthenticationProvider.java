@@ -19,6 +19,7 @@ import org.springframework.security.authentication.UsernamePasswordAuthenticatio
 import org.springframework.security.core.Authentication;
 import org.springframework.security.core.AuthenticationException;
 import org.springframework.security.core.authority.SimpleGrantedAuthority;
+import org.springframework.security.core.userdetails.UserDetails;
 import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
 import org.springframework.stereotype.Component;
 
@@ -104,8 +105,8 @@ public class CustomAuthenticationProvider implements AuthenticationProvider {
             throw new CustomAuthenticationException("INVALID_PASSWORD");
         }
 
-        // 4. Lấy quyền (role)
-        List<String> roleCodes = rolesRepo.getRoleCodeByUserName(userEntity.getUsername());
+        // 4. Lấy role
+        List<String> roleCodes = rolesRepo.getRoleCodeByUserId(userEntity.getId());
         var authorities = roleCodes.stream()
                 .map(SimpleGrantedAuthority::new)
                 .collect(Collectors.toList());
@@ -113,26 +114,37 @@ public class CustomAuthenticationProvider implements AuthenticationProvider {
         // 5. Lấy user detail bằng userId
         UserDetailEntity userDetailEntity = userDetailRepo.findByUserId(userEntity.getId());
 
-        // 6. Chuẩn bị thông tin người dùng trả về
-        List<String> scopes = new ArrayList<>();
-        UserInfoModel userInfoDTO = new UserInfoModel();
-        userInfoDTO.setId(userEntity.getId());
-        userInfoDTO.setUserName(userEntity.getUsername());
-        userInfoDTO.setExpireAt(expireAt(ETokenType.ACCESS_TOKEN));
-        userInfoDTO.setETokenType(ETokenType.ACCESS_TOKEN);
-        userInfoDTO.setScopes(scopes);
-        userInfoDTO.setAuthorities(roleCodes);
+        // 6. Tạo đối tượng Principal (UserInfoModel) để trả về
+        UserInfoModel userInfo = new UserInfoModel();
 
+        // Lấy thông tin từ UserEntity
+        userInfo.setId(userEntity.getId());
+        userInfo.setUserName(userEntity.getUsername());
+        // Giả sử UserEntity của bạn có trường email
+        // userInfo.setEmail(userEntity.getEmail());
+
+        // Map UserDetailEntity sang UserDetailModel
         if (userDetailEntity != null) {
-            userInfoDTO.setEmail(userDetailEntity.getEmail());
-            userInfoDTO.setUserDetail(ModelMapperUtils.toObject(userDetailEntity, UserDetailModel.class));
+            UserDetailModel userDetailModel = ModelMapperUtils.toObject(userDetailEntity, UserDetailModel.class);
+            userInfo.setUserDetail(userDetailModel);
         }
 
+        // Lấy thông tin Roles (đã query ở Bước 4)
+        // DTO của bạn dùng 'authorities' chứ không phải 'roles'
+        userInfo.setAuthorities(roleCodes);
+
+        // Thiết lập thông tin token (từ logic trong class của bạn)
+        userInfo.setETokenType(ETokenType.ACCESS_TOKEN);
+        // Gọi hàm private 'expireAt' mà bạn đã định nghĩa
+        userInfo.setExpireAt(expireAt(ETokenType.ACCESS_TOKEN));
+
         // 7. Trả kết quả xác thực
-        String principalJson = new Gson().toJson(userInfoDTO);
+        // Chuyển đối tượng userInfo thành JSON để làm principal
+        String principalJson = new Gson().toJson(userInfo);
+
+        // 'authorities' ở đây là List<SimpleGrantedAuthority> đã tạo ở Bước 4
         return new UsernamePasswordAuthenticationToken(principalJson, password, authorities);
     }
-
 
     @Override
     public boolean supports(Class<?> authentication) {
