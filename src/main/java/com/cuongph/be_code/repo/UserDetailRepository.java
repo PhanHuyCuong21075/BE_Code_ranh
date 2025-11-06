@@ -6,4 +6,7 @@ import org.springframework.stereotype.Repository;
 
 public interface UserDetailRepository extends JpaRepository<UserDetailEntity, Long> {
     UserDetailEntity findByUserId(Long UserId);
+
+    boolean existsByEmail(String email);
+
 }
