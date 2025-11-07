@@ -61,14 +61,14 @@ public class AuthService {
         }
 
         try {
-            // 1. Quá trình xác thực vẫn diễn ra
+
             Authentication auth = authManager.authenticate(
                     new UsernamePasswordAuthenticationToken(req.username(), req.password())
             );
 
             List<String> roles = auth.getAuthorities()
                     .stream()
-                    .map(GrantedAuthority::getAuthority) // Lấy tên quyền (role code)
+                    .map(GrantedAuthority::getAuthority)
                     .collect(Collectors.toList());
 
 

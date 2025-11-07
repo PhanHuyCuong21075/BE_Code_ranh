@@ -6,6 +6,7 @@ import com.cuongph.be_code.service.FriendService;
 import lombok.RequiredArgsConstructor;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PathVariable;
+import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
 
@@ -25,5 +26,10 @@ public class FriendsController {
     @GetMapping("/suggest/{username}")
     public ResponseData<Object> suggestFriends(@PathVariable String username) {
         return new ResponseData<>().success(friendService.suggestFriends(username));
+    }
+
+    @PostMapping("/request/{receiverId}")
+    public ResponseData<String> processRequestFriend(@PathVariable Long receiverId) {
+        return new ResponseData<String>().success(friendService.processRequestFriend(receiverId));
     }
 }

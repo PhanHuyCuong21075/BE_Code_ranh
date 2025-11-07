@@ -1,5 +1,7 @@
 package com.cuongph.be_code.jwt;
 
+import com.cuongph.be_code.dto.userCurrent.UserInfoModel;
+import com.cuongph.be_code.repo.UserRepository;
 import jakarta.servlet.FilterChain;
 import jakarta.servlet.ServletException;
 import jakarta.servlet.http.HttpServletRequest;
@@ -25,9 +27,12 @@ public class JwtAuthFilter extends OncePerRequestFilter {
 
     private final JwtUtils jwtUtils;
 
+    private final UserRepository userRepository;
+
     // ✅ Chỉ cần JwtUtils (không dùng UserDetailsService nữa)
-    public JwtAuthFilter(JwtUtils jwtUtils) {
+    public JwtAuthFilter(JwtUtils jwtUtils, UserRepository userRepository) {
         this.jwtUtils = jwtUtils;
+        this.userRepository = userRepository;
     }
 
     @Override
@@ -48,46 +53,66 @@ public class JwtAuthFilter extends OncePerRequestFilter {
             }
         }
 
-
         // ✅ 3. Lấy Authorization header
         String header = req.getHeader("Authorization");
-
+        String token = header.substring(7);
         // Nếu không có header hoặc không phải dạng Bearer token thì cho qua
-        if (header == null || !header.startsWith("Bearer ")) {
+        if (!header.startsWith("Bearer ")) {
             chain.doFilter(req, res);
             return;
         }
 
-        // ✅ 4. Cắt chuỗi lấy token
-        String token = header.substring(7);
-
-        // ✅ 5. Trích xuất username từ token
-        String username = jwtUtils.extractUsername(token);
-
-        // ✅ 6. Kiểm tra token hợp lệ (signature đúng, chưa hết hạn)
-        if (username != null && jwtUtils.isTokenValid(token, username)
-                && SecurityContextHolder.getContext().getAuthentication() == null) {
-
-            // ✅ 7. Lấy danh sách quyền từ token
-            List<String> roles = jwtUtils.extractAuthorities(token);
-
-            // ✅ 8. Chuyển đổi roles -> GrantedAuthority để Spring hiểu
-            var authorities = roles.stream()
-                    .map(SimpleGrantedAuthority::new)
-                    .collect(Collectors.toList());
-
-            // ✅ 9. Tạo Authentication object, credentials = null (vì đã xác thực bằng JWT)
-            UsernamePasswordAuthenticationToken authToken =
-                    new UsernamePasswordAuthenticationToken(username, null, authorities);
-
-            // ✅ 10. Đính kèm chi tiết request (IP, session ID, v.v.)
-            authToken.setDetails(new WebAuthenticationDetailsSource().buildDetails(req));
-
-            // ✅ 11. Đưa thông tin user đã xác thực vào SecurityContext
-            SecurityContextHolder.getContext().setAuthentication(authToken);
+        String username = null;
+        try {
+            username = jwtUtils.extractUsername(token);
+        } catch (Exception e) {
+            // (Không làm gì, để filter tiếp tục và trả về 401/403 sau)
+            logger.warn("JWT token không hợp lệ: " + e.getMessage());
         }
 
-        // ✅ 12. Cho phép request tiếp tục đi qua filter chain
+
+        // ✅ 5. Kiểm tra token hợp lệ VÀ CHƯA CÓ XÁC THỰC
+        if (username != null && SecurityContextHolder.getContext().getAuthentication() == null) {
+
+            UserInfoModel userInfo = this.userRepository.findByUsername(username)
+                    .map(userEntity -> {
+                        // Bắt đầu ánh xạ đơn giản
+                        UserInfoModel model = new UserInfoModel();
+
+                        // Map các trường khớp tên hoặc logic
+                        model.setId(userEntity.getId());
+                        model.setUserName(userEntity.getUsername());
+
+
+                        return model;
+                    })
+                    .orElse(null);
+
+            // Nếu tìm thấy user VÀ token hợp lệ
+            if (userInfo != null && jwtUtils.isTokenValid(token, userInfo.getUserName())) {
+
+                // (Phần 7, 8 - Lấy quyền - GIỮ NGUYÊN)
+                List<String> roles = jwtUtils.extractAuthorities(token);
+                var authorities = roles.stream()
+                        .map(SimpleGrantedAuthority::new)
+                        .collect(Collectors.toList());
+
+                // ----- 9. 🔥 THAY ĐỔI QUAN TRỌNG NHẤT -----
+                // Đặt toàn bộ đối tượng 'userInfo' làm principal
+                UsernamePasswordAuthenticationToken authToken =
+                        new UsernamePasswordAuthenticationToken(
+                                userInfo, // <-- KHÔNG PHẢI 'username' nữa
+                                null,
+                                authorities
+                        );
+
+                // (Phần 10, 11 - GIỮ NGUYÊN)
+                authToken.setDetails(new WebAuthenticationDetailsSource().buildDetails(req));
+                SecurityContextHolder.getContext().setAuthentication(authToken);
+            }
+        }
+
+        // ✅ 12. Cho phép request tiếp tục
         chain.doFilter(req, res);
     }
 }

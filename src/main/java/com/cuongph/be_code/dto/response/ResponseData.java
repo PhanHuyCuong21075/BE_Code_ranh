@@ -4,7 +4,6 @@ package com.cuongph.be_code.dto.response;
 import lombok.AllArgsConstructor;
 import lombok.Data;
 import lombok.NoArgsConstructor;
-import org.apache.logging.log4j.ThreadContext;
 
 import java.io.Serializable;
 
@@ -24,7 +23,6 @@ public class ResponseData<T> implements Serializable {
     public ResponseData<T> success(T data) {
         this.data = data;
         this.status = 200;
-        this.clientMessageId = ThreadContext.get("clientMessageId");
         return this;
     }
 
@@ -32,7 +30,6 @@ public class ResponseData<T> implements Serializable {
         this.status = status;
         this.errorCode = errorCode;
         this.errorDesc = errorDesc;
-        this.clientMessageId = ThreadContext.get("clientMessageId");
         return this;
     }
 
@@ -41,7 +38,6 @@ public class ResponseData<T> implements Serializable {
         this.errorCode = errorCode;
         this.errorDesc = errorDesc;
         this.data = data;
-        this.clientMessageId = ThreadContext.get("clientMessageId");
         return this;
     }
 

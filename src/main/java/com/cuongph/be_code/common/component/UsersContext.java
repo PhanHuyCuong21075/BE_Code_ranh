@@ -17,9 +17,14 @@ public class UsersContext {
 
     public Long getCurrentUserId() {
         Authentication authentication = SecurityContextHolder.getContext().getAuthentication();
-        Gson gson = new Gson();
-        var currentUser = gson.fromJson(authentication.getPrincipal().toString(), UserInfoModel.class);
 
+        // 1. Lấy principal, nó đã là UserInfoModel
+        Object principal = authentication.getPrincipal();
+
+        // 2. Ép kiểu (cast) nó sang UserInfoModel
+        UserInfoModel currentUser = (UserInfoModel) principal;
+
+        // 3. Trả về ID
         return currentUser.getId();
     }
 

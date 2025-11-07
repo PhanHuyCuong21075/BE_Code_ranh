@@ -3,6 +3,7 @@ package com.cuongph.be_code.common.auth;
 import com.cuongph.be_code.common.config.provider.CustomAuthenticationProvider;
 import com.cuongph.be_code.jwt.JwtAuthFilter;
 import com.cuongph.be_code.jwt.JwtUtils;
+import com.cuongph.be_code.repo.UserRepository;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
@@ -24,13 +25,15 @@ public class SecurityConfig {
 
     private final CustomAuthenticationProvider customAuthProvider;
     private final JwtUtils jwtUtils;
+    private final UserRepository userRepository;
 
     @Value("${cors.allowed.origins}")
     private String corsOrigins;
 
-    public SecurityConfig(CustomAuthenticationProvider customAuthProvider, JwtUtils jwtUtils) {
+    public SecurityConfig(CustomAuthenticationProvider customAuthProvider, JwtUtils jwtUtils, UserRepository userRepository) {
         this.customAuthProvider = customAuthProvider;
         this.jwtUtils = jwtUtils;
+        this.userRepository = userRepository;
     }
 
     @Bean
@@ -40,12 +43,12 @@ public class SecurityConfig {
 
     @Bean
     public SecurityFilterChain filterChain(HttpSecurity http) throws Exception {
-        JwtAuthFilter jwtFilter = new JwtAuthFilter(jwtUtils);
+        JwtAuthFilter jwtFilter = new JwtAuthFilter(jwtUtils,userRepository);
 
         http
                 .cors(cors -> cors.configurationSource(request -> {
                     CorsConfiguration cfg = new CorsConfiguration();
-                    cfg.setAllowedOriginPatterns(List.of("*")); // dùng patterns thay cho allowedOrigins
+                    cfg.setAllowedOriginPatterns(List.of("*"));
                     cfg.setAllowedMethods(List.of("GET", "POST", "PUT", "DELETE", "OPTIONS"));
                     cfg.setAllowedHeaders(List.of("*"));
                     cfg.setAllowCredentials(true);

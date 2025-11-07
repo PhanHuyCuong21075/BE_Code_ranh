@@ -10,4 +10,5 @@ public interface FriendService {
 
     List<UserEntity> suggestFriends(String username);
 
+    String processRequestFriend(Long receiverId);
 }

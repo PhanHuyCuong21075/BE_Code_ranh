@@ -27,18 +27,17 @@ public class FriendRepositoryImpl extends FriendRepositoryQuery implements Frien
     }
 
     @Override
-    public Optional<FriendEntity> findRelation(Long user1, Long user2) {
+    public Optional<FriendEntity> findFriendship(Long userId1, Long userId2) {
         Map<String, Object> params = new HashMap<>();
-        params.put("user1", user1);
-        params.put("user2", user2);
-        List<FriendEntity> result = sqlQueryUtil.queryForList(sqlFindRelation(), params, FriendEntity.class);
-        return result.stream().findFirst();
-    }
+        params.put("userId1", userId1);
+        params.put("userId2", userId2);
 
-    @Override
-    public List<UserEntity> findFriendsByUsername(String username) {
-        Map<String, Object> params = new HashMap<>();
-        params.put("username", username);
-        return sqlQueryUtil.queryForList(sqlFindFriendsByUsername(), params, UserEntity.class);
+        List<FriendEntity> results = sqlQueryUtil.queryForList(
+                sqlFindFriendship(),
+                params,
+                FriendEntity.class
+        );
+
+        return results.isEmpty() ? Optional.empty() : Optional.of(results.get(0));
     }
 }

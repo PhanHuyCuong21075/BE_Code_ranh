@@ -9,7 +9,5 @@ import java.util.Optional;
 public interface FriendRepositoryCustom {
     List<FriendEntity> findAcceptedFriends(Long userId);
 
-    Optional<FriendEntity> findRelation(Long user1, Long user2);
-
-    List<UserEntity> findFriendsByUsername(String username);
+    Optional<FriendEntity> findFriendship(Long userId1, Long userId2);
 }
