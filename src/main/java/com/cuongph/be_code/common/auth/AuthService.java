@@ -66,17 +66,12 @@ public class AuthService {
                     new UsernamePasswordAuthenticationToken(req.username(), req.password())
             );
 
-            // 2. LẤY QUYỀN TRỰC TIẾP TỪ 'auth' (KHÔNG CẦN DÙNG principal)
-            // auth.getAuthorities() đã được CustomAuthenticationProvider
-            // gán chính xác (new SimpleGrantedAuthority(roleCode))
             List<String> roles = auth.getAuthorities()
                     .stream()
                     .map(GrantedAuthority::getAuthority) // Lấy tên quyền (role code)
                     .collect(Collectors.toList());
 
-            // 3. SINH TOKEN
-            // Bạn đã có username từ request (req.username())
-            // Bạn đã có roles từ bước trên
+
             String token = jwtUtils.generateToken(req.username(), roles);
 
             // 4. LẤY ENTITY ĐỂ TRẢ THÊM INFO (Giữ nguyên logic của bạn)

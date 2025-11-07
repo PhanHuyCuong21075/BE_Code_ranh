@@ -52,10 +52,8 @@ public class PostServiceImpl implements PostService {
         UserEntity userEntity = userRepository.findByUsername(request.getUsername())
                 .orElseThrow(() -> new UsernameNotFoundException("User not found"));
 
-        // 🔹 Lấy danh sách bạn bè đã chấp nhận
         List<FriendEntity> friendEntities = friendRepository.findAcceptedFriends(userEntity.getId());
 
-        // 🔹 Lấy danh sách ID bạn bè
         List<Long> friendIds = friendEntities.stream()
                 .map(f -> f.getRequesterId().equals(userEntity.getId())
                         ? f.getReceiverId()
@@ -66,10 +64,8 @@ public class PostServiceImpl implements PostService {
         List<PostEntity> postEntities;
 
         if (!friendIds.isEmpty()) {
-            // ✅ Có bạn bè → Lấy bài của user + bạn bè (ưu tiên công khai hoặc chính họ)
             postEntities = postRepository.findPostsByUserIds(friendIds, userEntity.getId());
         } else {
-            // ✅ Không có bạn bè → Lấy bài công khai + bài của chính mình
             postEntities = postRepository.findAllPublicPostsAndUser(userEntity.getId());
         }
 
@@ -80,9 +76,6 @@ public class PostServiceImpl implements PostService {
                 .toList();
     }
 
-    /**
-     * Cập nhật bài viết (chỉ chủ sở hữu mới được sửa)
-     */
     public PostEntity updatePost(Long id, PostRequest request) {
         Authentication auth = SecurityContextHolder.getContext().getAuthentication();
         String currentUsername = auth.getName();
@@ -131,7 +124,7 @@ public class PostServiceImpl implements PostService {
         response.setId(postEntity.getId());
         response.setContent(postEntity.getContent());
         response.setIsPublic(postEntity.getIsPublic());
-        response.setTime(postEntity.getCreatedAt().toString());
+        response.setTime(postEntity.getCreatedAt());
 
         // 🔹 Lấy tên người đăng từ userId
         userRepository.findById(postEntity.getUserId())
