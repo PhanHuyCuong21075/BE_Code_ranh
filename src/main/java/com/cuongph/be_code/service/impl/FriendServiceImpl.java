@@ -1,6 +1,7 @@
 package com.cuongph.be_code.service.impl;
 
 import com.cuongph.be_code.common.component.UsersContext;
+import com.cuongph.be_code.dto.response.PendingFriendResponse;
 import com.cuongph.be_code.entity.FriendEntity;
 import com.cuongph.be_code.entity.UserEntity;
 import com.cuongph.be_code.repo.FriendRepository;
@@ -55,36 +56,21 @@ public class FriendServiceImpl implements FriendService {
 
     @Override
     public List<UserEntity> suggestFriends(String username) {
-        UserEntity currentUserEntity = userRepo.findByUsername(username)
+
+        UserEntity currentUser = userRepo.findByUsername(username)
                 .orElseThrow(() -> new UsernameNotFoundException("Not found"));
 
-        // 1️⃣ Lấy danh sách bạn bè hiện tại
-        List<UserEntity> currentFriends = getFriends(username);
+        // 1️⃣ Query lấy danh sách user gợi ý (loại bỏ bản thân + pending + accepted)
+        List<UserEntity> suggested = userRepo.findAllBySuggestedFriends(currentUser.getId());
 
-        // 2️⃣ Lấy tất cả bạn của bạn bè (friend-of-friend)
-        Set<UserEntity> friendOfFriends = new HashSet<>();
-        for (UserEntity friend : currentFriends) {
-            List<UserEntity> fof = getFriends(friend.getUsername());
-            friendOfFriends.addAll(fof);
-        }
+        // 2️⃣ Trộn lên cho tự nhiên, nếu muốn giới hạn 5 người
+        Collections.shuffle(suggested);
 
-        // Loại bỏ chính mình và bạn bè hiện tại
-        friendOfFriends.remove(currentUserEntity);
-        currentFriends.forEach(friendOfFriends::remove);
-
-        // 3️⃣ Nếu có bạn chung → ưu tiên họ
-        if (!friendOfFriends.isEmpty()) {
-            return new ArrayList<>(friendOfFriends);
-        }
-
-        // 4️⃣ Nếu không có bạn chung → random user khác
-        List<UserEntity> allUserEntities = userRepo.findAll();
-        allUserEntities.remove(currentUserEntity);
-        allUserEntities.removeAll(currentFriends);
-
-        Collections.shuffle(allUserEntities);
-        return allUserEntities.stream().limit(5).collect(Collectors.toList());
+        return suggested.stream()
+                .limit(5)
+                .collect(Collectors.toList());
     }
+
 
     @Override
     @Transactional
@@ -134,5 +120,45 @@ public class FriendServiceImpl implements FriendService {
 
         friendRepo.save(newRequest);
         return "Đã gửi lời mời kết bạn.";
+    }
+
+    @Override
+    public List<PendingFriendResponse> getPendingRequest(String username) {
+        UserEntity currentUser = userRepo.findByUsername(username)
+                .orElseThrow(() -> new UsernameNotFoundException("Not found"));
+
+        Long currentUserId = currentUser.getId();
+
+        // Lời mời mà mình gửi đi
+        List<FriendEntity> sentRequests = friendRepo.findAllByRequesterIdAndStatus(currentUserId, "PENDING");
+
+        // Lời mời mình nhận
+        List<FriendEntity> receivedRequests = friendRepo.findAllByReceiverIdAndStatus(currentUserId, "PENDING");
+
+        List<PendingFriendResponse> result = new ArrayList<>();
+
+        // Gộp: SENT REQUEST
+        for (FriendEntity fr : sentRequests) {
+            UserEntity user = userRepo.findById(fr.getReceiverId()).orElse(null);
+            if (user != null) {
+                PendingFriendResponse dto = new PendingFriendResponse();
+                dto.setUser(user);
+                dto.setType("SENT");
+                result.add(dto);
+            }
+        }
+
+        // Gộp: RECEIVED REQUEST
+        for (FriendEntity fr : receivedRequests) {
+            UserEntity user = userRepo.findById(fr.getRequesterId()).orElse(null);
+            if (user != null) {
+                PendingFriendResponse dto = new PendingFriendResponse();
+                dto.setUser(user);
+                dto.setType("RECEIVED");
+                result.add(dto);
+            }
+        }
+
+        return result;
     }
 }

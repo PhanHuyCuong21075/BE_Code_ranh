@@ -10,4 +10,5 @@ public interface FriendRepositoryCustom {
     List<FriendEntity> findAcceptedFriends(Long userId);
 
     Optional<FriendEntity> findFriendship(Long userId1, Long userId2);
+
 }

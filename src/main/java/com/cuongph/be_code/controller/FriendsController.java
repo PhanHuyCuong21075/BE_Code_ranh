@@ -32,4 +32,11 @@ public class FriendsController {
     public ResponseData<String> processRequestFriend(@PathVariable Long receiverId) {
         return new ResponseData<String>().success(friendService.processRequestFriend(receiverId));
     }
+
+
+    @GetMapping("/pending/{username}")
+    public ResponseData<Object> getPendingRequest(@PathVariable String username) {
+        return new ResponseData<>().success(friendService.getPendingRequest(username));
+
+    }
 }
