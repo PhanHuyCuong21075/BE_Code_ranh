@@ -30,4 +30,5 @@ public class AuthController {
     public ResponseData<Object> login(@RequestBody AuthRequest req) {
         return new ResponseData<>().success(authService.login(req));
     }
+
 }

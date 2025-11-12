@@ -55,6 +55,10 @@ public class JwtAuthFilter extends OncePerRequestFilter {
 
         // ✅ 3. Lấy Authorization header
         String header = req.getHeader("Authorization");
+        if (header == null || !header.startsWith("Bearer ")) {
+            chain.doFilter(req, res);
+            return;
+        }
         String token = header.substring(7);
         // Nếu không có header hoặc không phải dạng Bearer token thì cho qua
         if (!header.startsWith("Bearer ")) {

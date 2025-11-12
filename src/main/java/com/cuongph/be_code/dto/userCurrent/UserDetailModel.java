@@ -17,6 +17,6 @@ public class UserDetailModel implements Serializable {
     private String fullName;
     private String phone;
     private String email;
-    private Long gender;
+    private String gender;
     private String filePathAvatar;
 }
