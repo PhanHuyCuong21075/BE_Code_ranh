@@ -161,4 +161,31 @@ public class FriendServiceImpl implements FriendService {
 
         return result;
     }
+
+    @Override
+    @Transactional
+    public String rejectFriendRequest(Long otherUserId) {
+        Long currentUserId = usersContext.getCurrentUserId();
+
+        if (currentUserId.equals(otherUserId)) {
+            throw new RuntimeException("Bạn không thể tự tương tác với chính mình.");
+        }
+
+        Optional<FriendEntity> friendshipOpt = friendRepo.findFriendship(currentUserId, otherUserId);
+
+        if (friendshipOpt.isPresent()) {
+            FriendEntity friendship = friendshipOpt.get();
+
+            if (friendship.getStatus().equals("PENDING") &&
+                    friendship.getReceiverId().equals(currentUserId)) {
+
+                friendRepo.delete(friendship);
+                return "Đã từ chối lời mời.";
+            } else {
+                throw new RuntimeException("Không thể từ chối. Trạng thái không hợp lệ.");
+            }
+        } else {
+            throw new RuntimeException("Không tìm thấy lời mời kết bạn.");
+        }
+    }
 }

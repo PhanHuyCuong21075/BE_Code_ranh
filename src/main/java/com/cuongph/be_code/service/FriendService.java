@@ -14,4 +14,6 @@ public interface FriendService {
     String processRequestFriend(Long receiverId);
 
     List<PendingFriendResponse> getPendingRequest(String username);
+
+    String rejectFriendRequest(Long receiverId);
 }

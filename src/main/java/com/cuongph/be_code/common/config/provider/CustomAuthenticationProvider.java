@@ -19,11 +19,9 @@ import org.springframework.security.authentication.UsernamePasswordAuthenticatio
 import org.springframework.security.core.Authentication;
 import org.springframework.security.core.AuthenticationException;
 import org.springframework.security.core.authority.SimpleGrantedAuthority;
-import org.springframework.security.core.userdetails.UserDetails;
 import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
 import org.springframework.stereotype.Component;
 
-import java.util.ArrayList;
 import java.util.Date;
 import java.util.List;
 import java.util.Objects;
@@ -120,7 +118,6 @@ public class CustomAuthenticationProvider implements AuthenticationProvider {
         // Lấy thông tin từ UserEntity
         userInfo.setId(userEntity.getId());
         userInfo.setUserName(userEntity.getUsername());
-        // Giả sử UserEntity của bạn có trường email
         // userInfo.setEmail(userEntity.getEmail());
 
         // Map UserDetailEntity sang UserDetailModel
@@ -130,7 +127,6 @@ public class CustomAuthenticationProvider implements AuthenticationProvider {
         }
 
         // Lấy thông tin Roles (đã query ở Bước 4)
-        // DTO của bạn dùng 'authorities' chứ không phải 'roles'
         userInfo.setAuthorities(roleCodes);
 
         // Thiết lập thông tin token (từ logic trong class của bạn)
@@ -139,7 +135,6 @@ public class CustomAuthenticationProvider implements AuthenticationProvider {
         userInfo.setExpireAt(expireAt(ETokenType.ACCESS_TOKEN));
 
         // 7. Trả kết quả xác thực
-        // Chuyển đối tượng userInfo thành JSON để làm principal
         String principalJson = new Gson().toJson(userInfo);
 
         // 'authorities' ở đây là List<SimpleGrantedAuthority> đã tạo ở Bước 4

@@ -33,6 +33,11 @@ public class FriendsController {
         return new ResponseData<String>().success(friendService.processRequestFriend(receiverId));
     }
 
+    @PostMapping("/reject-request/{receiverId}")
+    public ResponseData<String> rejectFriendRequest(@PathVariable Long receiverId) {
+        return new ResponseData<String>().success(friendService.rejectFriendRequest(receiverId));
+    }
+
 
     @GetMapping("/pending/{username}")
     public ResponseData<Object> getPendingRequest(@PathVariable String username) {
