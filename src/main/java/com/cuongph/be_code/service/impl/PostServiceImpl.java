@@ -3,6 +3,7 @@ package com.cuongph.be_code.service.impl;
 import com.cuongph.be_code.dto.request.GetPostRequest;
 import com.cuongph.be_code.dto.request.PostRequest;
 import com.cuongph.be_code.dto.response.PostResponse;
+import com.cuongph.be_code.dto.userCurrent.UserInfoModel;
 import com.cuongph.be_code.entity.FriendEntity;
 import com.cuongph.be_code.entity.PostEntity;
 import com.cuongph.be_code.entity.UserEntity;
@@ -77,8 +78,7 @@ public class PostServiceImpl implements PostService {
     }
 
     public PostEntity updatePost(Long id, PostRequest request) {
-        Authentication auth = SecurityContextHolder.getContext().getAuthentication();
-        String currentUsername = auth.getName();
+        String currentUsername = getString();
 
         UserEntity userEntity = userRepository.findByUsername(currentUsername)
                 .orElseThrow(() -> new UsernameNotFoundException("User not found"));
@@ -94,6 +94,25 @@ public class PostServiceImpl implements PostService {
         postEntity.setIsPublic(request.getIsPublic());
         postEntity.setUpdateAt(LocalDateTime.now());
         return postRepository.save(postEntity);
+    }
+
+    private static String getString() {
+        Authentication auth = SecurityContextHolder.getContext().getAuthentication();
+
+        // 1. Lấy đối tượng Principal (thường là UserInfoModel)
+        Object principal = auth.getPrincipal();
+
+        String currentUsername;
+
+        // 2. Ép kiểu và trích xuất userName
+        if (principal instanceof UserInfoModel) {
+            currentUsername = ((UserInfoModel) principal).getUserName();
+        } else if (principal instanceof String) {
+            currentUsername = (String) principal;
+        } else {
+            throw new RuntimeException("Principal type not recognized");
+        }
+        return currentUsername;
     }
 
     /**

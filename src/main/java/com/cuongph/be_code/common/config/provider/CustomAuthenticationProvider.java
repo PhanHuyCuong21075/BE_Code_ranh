@@ -7,9 +7,8 @@ import com.cuongph.be_code.common.enums.ETokenType;
 import com.cuongph.be_code.dto.userCurrent.UserDetailModel;
 import com.cuongph.be_code.dto.userCurrent.UserInfoModel;
 import com.cuongph.be_code.entity.UserEntity;
-import com.cuongph.be_code.entity.UserDetailEntity;
 import com.cuongph.be_code.repo.RolesRepository;
-import com.cuongph.be_code.repo.UserDetailRepository;
+//import com.cuongph.be_code.repo.UserDetailRepository;
 import com.cuongph.be_code.service.UsersService;
 import com.cuongph.be_code.utils.mapper.ModelMapperUtils;
 import com.google.gson.Gson;
@@ -34,8 +33,8 @@ public class CustomAuthenticationProvider implements AuthenticationProvider {
     @Autowired
     private UsersService usersService;
 
-    @Autowired
-    private UserDetailRepository userDetailRepo;
+//    @Autowired
+//    private UserDetailRepository userDetailRepo;
 
     @Autowired
     private BCryptPasswordEncoder encoder;
@@ -49,12 +48,12 @@ public class CustomAuthenticationProvider implements AuthenticationProvider {
 
     public CustomAuthenticationProvider(
             UsersService usersService,
-            UserDetailRepository userDetailRepo,
+//            UserDetailRepository userDetailRepo,
             BCryptPasswordEncoder encoder,
             AppProperties appProperties,
             RolesRepository rolesRepo) {
         this.usersService = usersService;
-        this.userDetailRepo = userDetailRepo;
+//        this.userDetailRepo = userDetailRepo;
         this.encoder = encoder;
         this.appProperties = appProperties;
         this.rolesRepo = rolesRepo;
@@ -109,8 +108,8 @@ public class CustomAuthenticationProvider implements AuthenticationProvider {
                 .map(SimpleGrantedAuthority::new)
                 .collect(Collectors.toList());
 
-        // 5. Lấy user detail bằng userId
-        UserDetailEntity userDetailEntity = userDetailRepo.findByUserId(userEntity.getId());
+//        // 5. Lấy user detail bằng userId
+//        UserDetailEntity userDetailEntity = userDetailRepo.findByUserId(userEntity.getId());
 
         // 6. Tạo đối tượng Principal (UserInfoModel) để trả về
         UserInfoModel userInfo = new UserInfoModel();
@@ -120,11 +119,11 @@ public class CustomAuthenticationProvider implements AuthenticationProvider {
         userInfo.setUserName(userEntity.getUsername());
         // userInfo.setEmail(userEntity.getEmail());
 
-        // Map UserDetailEntity sang UserDetailModel
-        if (userDetailEntity != null) {
-            UserDetailModel userDetailModel = ModelMapperUtils.toObject(userDetailEntity, UserDetailModel.class);
-            userInfo.setUserDetail(userDetailModel);
-        }
+//        // Map UserDetailEntity sang UserDetailModel
+//        if (userDetailEntity != null) {
+//            UserDetailModel userDetailModel = ModelMapperUtils.toObject(userDetailEntity, UserDetailModel.class);
+//            userInfo.setUserDetail(userDetailModel);
+//        }
 
         // Lấy thông tin Roles (đã query ở Bước 4)
         userInfo.setAuthorities(roleCodes);
