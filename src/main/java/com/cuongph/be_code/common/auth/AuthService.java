@@ -3,6 +3,7 @@ package com.cuongph.be_code.common.auth;
 import com.cuongph.be_code.dto.auth.AuthRequest;
 import com.cuongph.be_code.dto.auth.AuthResponse;
 import com.cuongph.be_code.dto.auth.RegisterRequest;
+import com.cuongph.be_code.dto.userCurrent.UserInfoModel;
 import com.cuongph.be_code.entity.RoleEntity;
 //import com.cuongph.be_code.entity.UserDetailEntity;
 import com.cuongph.be_code.entity.UserEntity;
@@ -18,6 +19,7 @@ import org.springframework.security.authentication.BadCredentialsException;
 import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
 import org.springframework.security.core.Authentication;
 import org.springframework.security.core.GrantedAuthority;
+import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.security.core.userdetails.UsernameNotFoundException;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
@@ -125,5 +127,21 @@ public class AuthService {
         userRole.setUserId(userEntity.getId());
         userRole.setRoleId(defaultRole.getId());
         userRoleRepository.save(userRole);
+    }
+
+    public static String getCurrentUsername() {
+        Authentication auth = SecurityContextHolder.getContext().getAuthentication();
+        // 1. Lấy đối tượng Principal (thường là UserInfoModel)
+        Object principal = auth.getPrincipal();
+        String currentUsername;
+        // 2. Ép kiểu và trích xuất userName
+        if (principal instanceof UserInfoModel) {
+            currentUsername = ((UserInfoModel) principal).getUserName();
+        } else if (principal instanceof String) {
+            currentUsername = (String) principal;
+        } else {
+            throw new RuntimeException("Principal type not recognized");
+        }
+        return currentUsername;
     }
 }

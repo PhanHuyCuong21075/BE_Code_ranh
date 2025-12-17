@@ -21,6 +21,9 @@ import java.time.LocalDateTime;
 import java.util.*;
 import java.util.stream.Collectors;
 
+import static com.cuongph.be_code.common.auth.AuthService.getCurrentUsername;
+
+
 @Service
 @AllArgsConstructor
 public class PostServiceImpl implements PostService {
@@ -34,7 +37,9 @@ public class PostServiceImpl implements PostService {
      */
     @Override
     public PostEntity createPost(PostRequest request) {
-        UserEntity userEntity = userRepository.findByUsername(request.getUsername())
+        String currentUsername = getCurrentUsername();
+
+        UserEntity userEntity = userRepository.findByUsername(currentUsername)
                 .orElseThrow(() -> new UsernameNotFoundException("Not found"));
 
         PostEntity postEntity = new PostEntity();
@@ -78,7 +83,7 @@ public class PostServiceImpl implements PostService {
     }
 
     public PostEntity updatePost(Long id, PostRequest request) {
-        String currentUsername = getString();
+        String currentUsername = getCurrentUsername();
 
         UserEntity userEntity = userRepository.findByUsername(currentUsername)
                 .orElseThrow(() -> new UsernameNotFoundException("User not found"));
@@ -94,25 +99,6 @@ public class PostServiceImpl implements PostService {
         postEntity.setIsPublic(request.getIsPublic());
         postEntity.setUpdateAt(LocalDateTime.now());
         return postRepository.save(postEntity);
-    }
-
-    private static String getString() {
-        Authentication auth = SecurityContextHolder.getContext().getAuthentication();
-
-        // 1. Lấy đối tượng Principal (thường là UserInfoModel)
-        Object principal = auth.getPrincipal();
-
-        String currentUsername;
-
-        // 2. Ép kiểu và trích xuất userName
-        if (principal instanceof UserInfoModel) {
-            currentUsername = ((UserInfoModel) principal).getUserName();
-        } else if (principal instanceof String) {
-            currentUsername = (String) principal;
-        } else {
-            throw new RuntimeException("Principal type not recognized");
-        }
-        return currentUsername;
     }
 
     /**
@@ -136,7 +122,7 @@ public class PostServiceImpl implements PostService {
     }
 
     /**
-     * Convert Entity → Response
+      * Convert Entity → Response@!@!!@@!@@!#$#@!
      */
     private PostResponse convertToResponse(PostEntity postEntity) {
         PostResponse response = new PostResponse();
