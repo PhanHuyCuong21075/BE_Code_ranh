@@ -3,6 +3,7 @@ package com.cuongph.be_code.service.impl;
 import com.cuongph.be_code.dto.request.CommentCreateRequest;
 import com.cuongph.be_code.dto.response.CommentsResponse;
 import com.cuongph.be_code.entity.CommentEntity;
+import com.cuongph.be_code.entity.PostEntity;
 import com.cuongph.be_code.entity.UserEntity;
 import com.cuongph.be_code.repo.CommentRepository;
 import com.cuongph.be_code.repo.UserRepository;
@@ -49,7 +50,7 @@ public class CommentServiceIml implements CommentService {
         }
         // 👉 UPDATE
         else {
-            comment = commentRepository.findById(request.getPostId())
+            comment = commentRepository.findById(request.getCommentId())
                     .orElseThrow(() -> new RuntimeException("Comment not found"));
 
             if (!comment.getUserId().equals(user.getId())) {
@@ -70,6 +71,21 @@ public class CommentServiceIml implements CommentService {
     @Override
     public List<CommentsResponse> commentsInPost(Long postId) {
         return commentRepository.findCommentsByPostId(postId);
+    }
+
+    @Override
+    public void deleteComment(Long id) {
+        String currentUsername = getCurrentUsername();
+        UserEntity userEntity = userRepository.findByUsername(currentUsername)
+                .orElseThrow(() -> new UsernameNotFoundException("User not found"));
+        CommentEntity comment = commentRepository.findById(id)
+                .orElseThrow(() -> new RuntimeException("Bài viết không tồn tại"));
+
+        if (!comment.getUserId().equals(userEntity.getId())) {
+            throw new RuntimeException("You are not allowed to delete this comment");
+        }
+        commentRepository.deleteById(id);
+
     }
 }
 

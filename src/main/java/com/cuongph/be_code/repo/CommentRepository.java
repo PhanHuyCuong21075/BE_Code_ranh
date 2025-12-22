@@ -13,6 +13,7 @@ public interface CommentRepository extends JpaRepository<CommentEntity, Long> {
 
     @Query("""
                 SELECT new com.cuongph.be_code.dto.response.CommentsResponse(
+                    c.id,
                     u.username,
                     c.content,
                     c.imageUrl,
@@ -27,5 +28,6 @@ public interface CommentRepository extends JpaRepository<CommentEntity, Long> {
     List<CommentsResponse> findCommentsByPostId(
             @Param("postId") Long postId
     );
+
 
 }

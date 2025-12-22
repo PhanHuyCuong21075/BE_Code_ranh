@@ -9,6 +9,7 @@ import java.time.LocalDateTime;
 @Data
 @AllArgsConstructor
 public class CommentsResponse {
+    private Long id;
     private String userComment;
     private String content;
     private String imageUrl;

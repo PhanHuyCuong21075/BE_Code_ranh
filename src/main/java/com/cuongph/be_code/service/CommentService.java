@@ -8,7 +8,9 @@ import java.util.List;
 
 public interface CommentService {
 
-    CommentEntity createOrUpdateComment( CommentCreateRequest request);
+    CommentEntity createOrUpdateComment(CommentCreateRequest request);
 
     List<CommentsResponse> commentsInPost(Long id);
+
+      void deleteComment(Long id);
 }
